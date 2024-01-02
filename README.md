@@ -150,6 +150,7 @@ This means that for each location, we will estimate 5 different effective popula
 	<img style="width:70%;" src="figures/scheme.png" alt="">
 	<figcaption>Figure 5: Description of the parameterization of the skyline model. In this case, 4 Ne's are estimated. Between the points where the Ne's are estimated, MASCOT-Skyline assumes exponential growth.</figcaption>
 </figure>
+</br>
 
 
 
