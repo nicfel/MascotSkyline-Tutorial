@@ -68,6 +68,7 @@ First, we have to download the package MASCOT (we need at least version 3.0.5) u
 	<img style="width:50%;" src="figures/MascotDownload.png" alt="">
 	<figcaption>Figure 1: Download the MASCOT package.</figcaption>
 </figure>
+</br>
 
 MASCOT will only be available in BEAUti once you close and restart the program.
 
@@ -89,6 +90,7 @@ The sampling times are encoded in the sequence names.  We can tell BEAUti to use
 	<img style="width:70%;" src="figures/TipDates.png" alt="">
 	<figcaption>Figure 2: Guess sampling times.</figcaption>
 </figure>
+</br>
 
 Clicking "OK" should now populate the table with the sample times extracted from the sequence names: the column **Date** should now have values between 2016 and 2015 and the column **Height** should have values from 0 to 2. The heights denote the time difference from a sequence to the most recently sampled sequence. If everything is specified correctly, the sequence with Height 0.0 should have a date of 2016.77.
 
@@ -103,6 +105,7 @@ This can be done by setting the _Gamma Category Count_ to 4, which is just a val
 	<img style="width:70%;" src="figures/SiteModel.png" alt="">
 	<figcaption>Figure 4: Set the site model.</figcaption>
 </figure>
+</br>
 
 
 ### Set the clock model (Clock Model)
@@ -121,6 +124,7 @@ To use skyline dynamics, we have to choose `Skyline` from the drop-down menu nex
 	<img style="width:70%;" src="figures/Skyline.png" alt="">
 	<figcaption>Figure 4: Setting the MASCOT dynamics to Skyline.</figcaption>
 </figure>
+</br>
 
 We next have to define the sampling location of the individual tips. Initially, the column **Location** should be NOT_SET for every sequence. After clicking the _Guess_ button, you can split the sequence on the vertical bar "|" again by selecting "split on character" and entering "|" in the box. However, the locations are in the fourth group, so this time choose "4" from the drop-down menu. After clicking the _OK_ button, the window should look like the one shown in the figure below:
 
@@ -129,6 +133,7 @@ We next have to define the sampling location of the individual tips. Initially, 
 	<img style="width:70%;" src="figures/TipLocations.png" alt="">
 	<figcaption>Figure 5: Configuring sample locations.</figcaption>
 </figure>
+</br>
 
 When leaving the priors tab and then returning to it, there will be an option to choose the population dynamics of each state separately.
 Leaving the priors tab is currently necessary to make the option appear (as it forces the tab to reload), but will hopefully not be necessary in the future.
@@ -138,6 +143,7 @@ Leaving the priors tab is currently necessary to make the option appear (as it f
 	<img style="width:70%;" src="figures/SetSkyline.png" alt="">
 	<figcaption>Figure 5: Set the Ne dynamics in both locations to Skyline dynamics.</figcaption>
 </figure>
+</br>
 
 
 We next set the dynamics of both locations `Brazil_Northeast` and `Caribbean` to Skyline dynamics.
@@ -148,45 +154,37 @@ This means that for each location, we will estimate 5 different effective popula
 <figure>
 	<a id="fig:example1"></a>
 	<img style="width:70%;" src="figures/scheme.png" alt="">
-	<figcaption>Figure 5: Description of the parameterization of the skyline model. In this case, 4 Ne's are estimated. Between the points where the Ne's are estimated, MASCOT-Skyline assumes exponential growth.</figcaption>
+	<figcaption>Figure 6: Description of the parameterization of the skyline model. In this case, 4 Ne's are estimated. Between the points where the Ne's are estimated, MASCOT-Skyline assumes exponential growth.</figcaption>
 </figure>
 </br>
 
+Now, we need to set the priors for the effective population sizes. We here consider non-parametric population size dynamics. This means that we do not have a parametric function guiding the change in the effective population sizes over time (such as exponential growth). This allows us to describe relatively arbitrary dynamics in the effective population sizes over time. However, we still know that the Ne at time t+1 is dependent on the Ne at time t. In other words, the current size of the population can't be too far away from the past population size. 
 
+To input this knowledge into the model, we use what is sometimes referred to as a "smoothing prior" on the effective population sizes. Here, we want to use Gaussian Markov Random Field (GMRF) prior. The GMRF prior assumes that the effective population size of the log(Ne(t+1)) is a random draw from a normal distribution around with mean log(Ne(t)) and standard deviation sigma. The GMRF prior here is used to model temporal autocorrelation.
 
-Now, we need to set the priors for the various parameters of the model. We do this by switching to the "Priors" tab.
+To set the GMRF prior, we have to put a prior distribution on the difference between the log effective population sizes, here described by `diff.SkylineNe.Brazil_Northeast` and `diff.SkylineNe.Caribbean`. To do so, we can click on the field to the right of `SkylineNe.Brazil_Northeast` and `diff.SkylineNe.Caribbean` and choose a Normal Distribution
 
-First, consider the effective population size parameter.  Since we have only a few samples per location, meaning little information about the different effective population sizes, we will need an informative prior. In this case we will use a log normal prior with parameters M=0 and S=1.  (These are respectively the mean and variance of the corresponding normal distribution in log space.) To use this prior, choose "Log Normal" from the dropdown menu to the right of the Ne.t:H3N2 parameter label, then click the arrow to the left of the same label and fill in the parameter values appropriately (i.e. M=0 and S=1). Ensure that the "mean in real space" checkbox remains unchecked.
-
-The existing exponential distribution as a prior on the migration rate puts much weight on lower values while not prohibiting larger ones. For migration rates, a prior that prohibits too large values while not greatly distinguishing between very small and very *very* small values is generally a good choice. Be aware however that the exponential distribution is quite an informative prior: one should be careful that to choose a mean so that feasible rates are at least within the 95% HPD interval of the prior.  (This can be determined by clicking the arrow to the left of the parameter name and looking at the values below the graph that appears on the right.)
-
-Finally, set the prior for the clock rate. We have a good idea about the clock rate of Influenza A/H3N2 Hemagglutinin. From previous work by other people, we know that the clock rate will be around 0.005 substitution per site per year. To include that prior knowledger, we can set the prior on the clock rate to a log normal distribution with mean in **real space**. To specify the mean in real space, make sure that the box *Mean In Real Space* is checked. If we set the S value to 0.25, we say that we expect the clock rate to be with 95% certainty between 0.00321 and 0.00731.
 <figure>
 	<a id="fig:example1"></a>
 	<img style="width:70%;" src="figures/Priors.png" alt="">
-	<figcaption>Figure 6: Set up of the prior distributions.</figcaption>
+	<figcaption>Figure 7: Set up Gaussian Markov Random Field (GMRF) prior/smoothing prior on the effective population sizes.</figcaption>
 </figure>
 
 
 ### Specify the MCMC chain length (MCMC)
 
-Now switch to the "MCMC" tab. Here we can set the length of the MCMC
-chain and decide how frequently the parameter and trees are
-logged. For this dataset, 2 million iterations should be
-sufficient. In order to have enough samples but not create too large
-files, we can set the logEvery to 5000, so we have 401 samples
-overall. Next, we have to save the `*.xml` file using _File >> Save
+Now switch to the "MCMC" tab. Here we can set the length of the MCMC chain and decide how frequently the parameter and trees are logged. For this dataset, 2 million iterations should be sufficient. Next, we have to save the `*.xml` file using _File >> Save
 as_.
 
 <figure>
 	<a id="fig:example1"></a>
 	<img style="width:70%;" src="figures/MCMC.png" alt="">
-	<figcaption>Figure 7: save the \*.xml.</figcaption>
+	<figcaption>Figure 8: save the \*.xml.</figcaption>
 </figure>
 
 ### Run the Analysis using BEAST2
 
-Run the `*.xml` using BEAST2 or use finished runs from the *precooked-runs* folder. The analysis should take about 6 to 7 minutes. If you want to learn some more about what the migration rates we actually estimate, have a look at this blog post of Peter Beerli [http://popgen.sc.fsu.edu/Migrate/Blog/Entries/2013/3/22_forward-backward_migration_rates.html](http://popgen.sc.fsu.edu/Migrate/Blog/Entries/2013/3/22_forward-backward_migration_rates.html).
+Run the `*.xml` using BEAST2 or use finished runs from the *precooked-runs* folder. 
 
 ### Analyse the log file using Tracer
 
