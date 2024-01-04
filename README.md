@@ -10,7 +10,14 @@ tracerversion: 1.7.2
 
 # Background
 
-The structured coalescent models how lineages coalesce within and migrate between sub-populations using coalescent and migration rates, which can be related to epidemiologically more meaningful parameters, such as the prevalence and transmission rates {% cite volz2012complex --file MascotSkyline-Tutorial/master-refs %}. Structured coalescent methods largely assume that the rates of coalescence and migration are constant over time, though deterministic approaches to model parametric dynamics from compartmental models exist {% cite volz2018bayesian --file MascotSkyline-Tutorial/master-refs %}. Here, we introduce a phylodynamic framework to infer non-parametric effective population size (Ne) dynamics under the marginal approximation of the structured coalescent (MASCOT). The effective population sizes are estimated at predefined points in time, between which we assume exponential growth dynamics\citep{volz2018modeling}. As such, we allow the Ne's to continuously change over time instead of assuming piecewise constant dynamics, as is typically used in skyline approaches (for example~\citep{gill2013improving}). We use a Gaussian Markov Random Field (GMRF), as in~\citep{gill2013improving} for unstructured populations, to model the temporal correlation Ne's. We then estimate Ne trajectories for each sub-population in the model using Markov chain Monte Carlo (MCMC) by using MCMC operations that learn the correlations structure between the different parameters~\cite{baele2017adaptive}. We first show, using simulations, that we can retrieve non-parametric population dynamics and migration rates of different sub-populations from phylogenetic trees. We then show how accounting for population structure improves the inference of population dynamics and vice versa. Lastly, we compare the ancestral state reconstruction and inference results of migration rates between MASCOT-Skyline and DTA~\citep{lemey2009bayesian} using a dataset of SARS-CoV-2 sequences and Susceptible-Infected-Recovered (SIR) simulations. We implemented MASCOT-Skyline as part of the BEAST2 package MASCOT~\citep{muller2018mascot}, an addon to the Bayesian phylogenetics software platform BEAST2~\citep{bouckaert2019beast}
+The structured coalescent models how lineages coalesce within and migrate between sub-populations using coalescent and migration rates, which can be related to epidemiologically more meaningful parameters, such as the prevalence and transmission rates {% cite volz2012complex --file MascotSkyline-Tutorial/master-refs %}. Structured coalescent methods largely assume that the rates of coalescence and migration are constant over time, though deterministic approaches to model parametric dynamics from compartmental models exist {% cite volz2018bayesian --file MascotSkyline-Tutorial/master-refs %}. 
+Here, we learn to use a phylodynamic framework to infer non-parametric effective population size (Ne) dynamics under the marginal approximation of the structured coalescent (MASCOT). 
+We will do so using a subset of the ZIKA virus analyses from {% cite volz2017phylogeography --file MascotSkyline-Tutorial/master-refs %}. Instead of using the full dataset, which would take too long to run in this tutorial, we use 49 sequences from the Northeast of Brazil or the Caribbean.
+
+We will estimate effective population sizes at predefined points in time {% cite volz2018modeling --file MascotSkyline-Tutorial/master-refs %}. 
+To model the temporal correlation between effective population sizes, we will use a Gaussian Markov Random Field (GMRF), as in{% cite gill2013improving --file MascotSkyline-Tutorial/master-refs %}. 
+We will then estimate Ne trajectories for the Northeast of Brazil and the Carribean. 
+
 
 ----
 
@@ -25,11 +32,11 @@ BEAST2 ([http://www.beast2.org](http://www.beast2.org)) is a free software packa
 
 BEAUti2 is a graphical user interface tool for generating BEAST2 XML configuration files.
 
-Both BEAST2 and BEAUti2 are Java programs, which means that the exact same code runs on all platforms. For us it simply means that the interface will be the same on all platforms. The screenshots used in this tutorial are taken on a Mac OS X computer; however, both programs will have the same layout and functionality on both Windows and Linux. BEAUti2 is provided as a part of the BEAST2 package so you do not need to install it separately.
+Both BEAST2 and BEAUti2 are Java programs, which means that the same code runs on all platforms. For us, it simply means that the interface will be the same on all platforms. The screenshots used in this tutorial are taken on a Mac OS X computer; however, both programs will have the same layout and functionality on both Windows and Linux. BEAUti2 is provided as a part of the BEAST2 package so you do not need to install it separately.
 
 ### TreeAnnotator
 
-TreeAnnotator is used to summarise the posterior sample of trees to produce a maximum clade credibility tree. It can also be used to summarise and visualise the posterior estimates of other tree parameters (e.g. node height).
+TreeAnnotator is used to summarise the posterior sample of trees to produce a maximum clade credibility tree. It can also be used to summarise and visualize the posterior estimates of other tree parameters (e.g. node height).
 
 TreeAnnotator is provided as a part of the BEAST2 package so you do not need to install it separately.
 
@@ -41,7 +48,7 @@ Tracer ([http://tree.bio.ed.ac.uk/software/tracer](http://tree.bio.ed.ac.uk/soft
 
 ### IcyTree.org
 
-IcyTree.org is a web-based tree viewer that, in addition to trees, also allows the user to visualize networks in the extended newick format {% cite vaughan2017icytree --file Mascot-Tutorial/master-refs %}.
+IcyTree.org is a web-based tree viewer that, in addition to trees, also allows the user to visualize trees without needing a standalone program {% cite vaughan2017icytree --file Mascot-Tutorial/master-refs %}.
 
 ----
 
@@ -205,8 +212,18 @@ Next, we can have a look at the inferred migration rates. The migration rates ar
 <figure>
 	<a id="fig:example1"></a>
 	<img style="width:70%;" src="figures/ForwardMig.png" alt="">
-	<figcaption>Figure 11: Estimates of the forward migration rate between the Northeast of Brazil and the Carribean.</figcaption>
+	<figcaption>Figure 11: Estimates of the forward migration rate between the Northeast of Brazil and the Caribbean.</figcaption>
 </figure><br> 
+
+Next, we can scroll up the log file and look at the number of inferred events between the Northeast of Brazil and the Caribbean. The number of events is the number of times that an infected individual in location a moved to b that are observable in the tree. 
+
+<figure>
+	<a id="fig:example1"></a>
+	<img style="width:70%;" src="figures/MigEvents.png" alt="">
+	<figcaption>Figure 11: Estimates of the number of migration events between the Northeast of Brazil and the Caribbean.</figcaption>
+</figure><br> 
+
+**QUESTION:** What do you notice about the number of migration events and the inferred migration rates?
 
 ### Make the MCC tree using TreeAnnotator
 
@@ -219,10 +236,15 @@ Next, we want to summarize the trees. This we can do using TreeAnnotator. Open t
 </figure>
 
 ### Check the MCC tree using FigTree
-In each logging step of the tree during the MCMC, MASCOT logs several different things. It logs the inferred probability of each node being in any possible location. In this example, these would be the inferred probabilities of being in Hong Kong, New York and New Zealand. Additonally, it logs the most likely location of each node.
 
+Mascot, by default, logs three different log files. The file `ZIKV.sequences.trees` logs the location of each internal node. The file `ZIKV.sequences.events.trees` logs the full migration history of each lineage, meaning it explicitly sample and logs individual migration events.
+The file `ZIKV-sequences.trees` is essentially the same as the `ZIKV.sequences.trees` file but without the migration history, and is only there due to technical reasons.
+
+To summarize the trees, we can use TreeAnnotator. Open the program and then set the options as below. You have to specify the _Burnin percentage_, the _Node heights_, _Input Tree File_ and the _Output File_. After clicking _Run_ the program should summarize the trees. The tree file to summarize should be `ZIKV.sequences.trees`. (Note that, currently, TreeAnnotator does not support summarizing over tree files with the full migration history).
+
+Next, we can visualize the trees using IcyTree.org. To do so, go to [https://icytree.org](https://icytree.org) and drag and dtop the MCC tree file into the window.
 After opening the MCC tree in FigTree, we can visualize several things.
-To color branches, you can go to _Appearance >> Colour by_ and select *max*. This is the location that was inferred to be most often the most likely location of the node.
+To color branches, you can go to _Style >> Colour edges by_ and select *max*. This is the location that was inferred to be most often the most likely location of the node.
 
 <figure>
 <a id="fig:example1"></a>
@@ -230,13 +252,8 @@ To color branches, you can go to _Appearance >> Colour by_ and select *max*. Thi
 <figcaption>Figure 13: Inferred node locations.</figcaption>
 </figure>
 
-We can now determine if lineages ancestral to samples from New York are actually inferred to be from Hong Kong, or the probability of the root being in any of the locations.
+We can now confirm that there is indeed a predominant transmission of viral lineages from the Northeast of Brazil to the Caribbean. We can also see that the root is inferred to be in the Northeast of Brazil.
 
-To get the actual inferred probabilities of each node being in any of the 3 locations, you can go to _Node Labels >> Display_ an then choose Hong\_Kong, New\_York or New\_Zealand. These are the actual inferred probabilities of the nodes being in any location.
-
-It should however be mentioned that the inference of nodes being in a particular location makes some simplifying assumptions, such as that there are no other locations (i.e. apart from the sampled locations) where lineages could have been.
-
-Another important thing to know is that currently, we assume rates to be constant. This means that we assume that the population size of the different locations does not change over time. We also make the same assumption about the migration rates through time.
 
 ### Errors that can occur (Work in progress)
 
@@ -250,7 +267,6 @@ Instead of doing that, this state is rejected by assigning its log probability t
 This error can have different origins and a likely incomplete list is the following:
 1. The priors on migration rates put too much weight on really high rates. To fix this, reconsider your priors on the migration rates. Particularly, check if the prior on the migration rates make sense in comparison to the height of the tree. If, for example, the tree has a height of 1000 years, but the prior on the migration rate is exponential with mean 1, then the prior assumption is that between any two states, we expected approximately 1000 migration events.
 2. The prior on the effective population sizes is too low, meaning that the prior on the coalescent rates (1 over the effective population size) is too high. This can for example occur when the prior on the effective population size was chosen to be 1/X. To fix, reconsider your prior on the effective population size.
-3. There is substantial changes of the effective population sizes and/or migration rates over time that are not modeled. In that case, changes in the effective population sizes or migration rates have to be explained by population structure, which can again lead to some effective population sizes being very low and some migration rates being very high. In that case, there is unfortunately not much that can be done, since MASCOT is not an appropriate model for the dataset.
 4. There is strong subpopulation structure within the different subpopulations used. In that case, reconsider if the individual sub-populations used are reasonable.
 
 
