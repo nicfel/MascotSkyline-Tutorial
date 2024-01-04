@@ -2,11 +2,16 @@
 if (!requireNamespace("ggtree", quietly = TRUE)) install.packages("ggtree")
 if (!requireNamespace("ape", quietly = TRUE)) install.packages("ape")
 if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages("ggplot2")
+if (!requireNamespace("treeio", quietly = TRUE)) install.packages("treeio")
+if (!requireNamespace("coda", quietly = TRUE)) install.packages("coda")
+
 
 # Load the necessary libraries
 library(ggtree)
 library(ape)
 library(ggplot2)
+library(treeio)
+library(coda)
 
 # Define the Okabe-Ito color scale (8 colors)
 okabe_ito_scale <- c("Caribbean"="#0072B2", "Brazil_Northeast"="#D55E00")
@@ -86,7 +91,7 @@ for (i in seq(1, length(locations))){
     vals=exp(as.mcmc(tmp.ne[seq(j, length(tmp.ne), length(times_points_interpl))]))
     hpd.5 = HPDinterval(vals, prob=0.5)
     hpd.95 = HPDinterval(vals, prob=0.95)
-    timestart = mrsi-times_points_interpl[[j]]*365
+    timestart = mrsi-times_points_interpl[[j]]
     dat = rbind(dat, data.frame(time = timestart,
                                             l.5=hpd.5[1,"lower"], u.5=hpd.5[1,"upper"],
                                             l.95=hpd.95[1,"lower"], u.95=hpd.95[1,"upper"],
