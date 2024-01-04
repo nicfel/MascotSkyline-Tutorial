@@ -254,6 +254,9 @@ To color branches, you can go to _Style >> Colour edges by_ and select *max*. Th
 
 We can now confirm that there is indeed a predominant transmission of viral lineages from the Northeast of Brazil to the Caribbean. We can also see that the root is inferred to be in the Northeast of Brazil.
 
+### ADVANCED: make Ne and tree plots in R
+
+We can also plot the effective population sizes and the tree in R. To do so, we provide a file called `plotMascotSkyline.R`. This R script is supposed to make you familiar with plotting your MASCOT-Skyline results in R
 
 ### Errors that can occur (Work in progress)
 
