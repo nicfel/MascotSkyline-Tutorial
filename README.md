@@ -80,7 +80,7 @@ MASCOT will only be available in BEAUti once you close and restart the program.
 
 ### Loading the Influenza A/H3N2 Sequences (Partitions)
 
-The sequence alignment is in the file [H3N2.nexus](http://github.com/nicfel/MascotSkyline-Tutorial/raw/master/data/sequences.nexus).
+The sequence alignment is in the file [sequences.nexus](https://raw.githubusercontent.com/nicfel/MascotSkyline-Tutorial/main/data/sequences.fasta).
 Right-click on this link and save it to a folder on your computer.
 Once downloaded, this file can either be drag-and-dropped into BEAUti or added by using BEAUti's menu system via _File >> Import Alignment_.
 Once the sequences are added, we need to specify the sampling dates and locations.
@@ -101,7 +101,7 @@ Clicking "OK" should now populate the table with the sample times extracted from
 
 ### Specify the Site Model (Site Model)
 
-Next, we have to specify the site model. To do this, choose the "Site Model" tab. For Influenza Hemagluttanin sequences as we have here, HKY is the most commonly used model of nucleotide evolution. This model allows for differences in transversion and transition rates, meaning that changes between bases that are chemically more closely related (transitions) are allowed to have a different rate to changes between bases that are chemically more distinct (transversions).
+Next, we have to specify the site model. To do this, choose the "Site Model" tab. We will use an HKY+Gamma_4 model. This model allows for differences in transversion and transition rates, meaning that changes between bases that are chemically more closely related (transitions) are allowed to have a different rate to changes between bases that are chemically more distinct (transversions).
 Additionally, we should allow for different rate categories for different sires in the alignment.
 This can be done by setting the _Gamma Category Count_ to 4, which is just a value that has typically been used. Make sure that the estimate is checked next to the shape parameter. To reduce the number of parameters we have to estimate, we can set Frequencies to Empirical.
 
@@ -123,6 +123,7 @@ To do so, search the drop-down menu next to `Tree.t:sequences` and choose MASCOT
 To see more options, we have to expand the MASCOT tree prior by clicking the arrow to the left of the label.
 By default, the rate dynamics for this setting are `Constant`, which means that effective population sizes and migration rates are assumed to be constant through time.
 To use skyline dynamics, we have to choose `Skyline` from the drop-down menu next to `Dynamics`.
+
 <figure>
 	<a id="fig:example1"></a>
 	<img style="width:70%;" src="figures/Skyline.png" alt="">
